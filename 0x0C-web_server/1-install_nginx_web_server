@@ -5,7 +5,6 @@
 #   curl http://54.196.37.117/   --> returns header info
 
 sudo apt-get update
-sudo apt-get upgrade
 sudo apt-get install nginx
 sudo ufw 'Nginx HTTP'
 
@@ -13,3 +12,5 @@ echo "Hello World!" | sudo tee /var/www/html/index.html
 
 #testing nginx configuration
 sudo nginx -t
+
+sudo service nginx reload
