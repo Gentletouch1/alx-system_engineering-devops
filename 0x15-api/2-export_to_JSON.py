@@ -1,33 +1,42 @@
 #!/usr/bin/python3
 """
-Module 0-gather_data_from_an_API
+This module gathers data from a REST API to retrieve information
+about the TODO list progress for a given employee ID.
 """
 
 import json
 import requests
-from sys import argv
+import sys
 
-if __name__ == '__main__':
 
-    id = argv[1]
-    user = requests.get('https://jsonplaceholder.typicode.com/users/{}'.format(
-        id)).json()
-    username = user.get('username')
-    todo = requests.get("https://jsonplaceholder.typicode.com/todos?userId={}".
-                        format(id)).json()
-    json_filename = id + ".json"
+if __name__ == "__main__":
+    """
+    Retrieves the TODO list progress for a given employee ID
+    and prints the employee's name and the number of completed tasks.
+    """
+    # Gets Employee information
+    user_id = int(sys.argv[1])
+    user_url = "https://jsonplaceholder.typicode.com/users/{}".format(user_id)
+    user_response = requests.get(user_url).json()
+    username = user_response.get("username")
+    print(username)
 
-    tasks = []
+    # Get number of tasks done
+    todo_url = "https://jsonplaceholder.typicode.com/todos"
+    todos_response = requests.get(todo_url).json()
 
-    for task in todo:
-        task_dict = {}
-        task_dict["task"] = task.get('title')
-        task_dict["completed"] = task.get('completed')
-        task_dict["username"] = username
-        tasks.append(task_dict)
+    output = {
+        user_id: [
+            {
+                "task": task.get("title"),
+                "completed": task.get("completed"),
+                "username": username
+            }
+            for task in todos_response if task.get("userId") == user_id
+        ]
+    }
 
-    dictionary = {}
-    dictionary[id] = tasks
+    # print(output)
 
-    with open(json_filename, "w") as json_file:
-        json.dump(dictionary, json_file)
+    with open("{}.json".format(str(user_id)), "w", encoding="utf-8") as file_:
+        json.dump(output, file_)
